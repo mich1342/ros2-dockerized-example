@@ -1,0 +1,41 @@
+version: "3.9"
+services:
+  talker:
+    image: my_ros_images:talker
+    build:
+      context: .
+      dockerfile: publisher/Dockerfile
+    network_mode: host
+    user: ros
+    ipc: host
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /publisher/sources:/ros2_ws/src
+    command: ros2 run cpp_talker talker
+  listener:
+    image: my_ros_images:listener
+    build:
+      context: .
+      dockerfile: subscriber/Dockerfile
+    network_mode: host
+    user: ros
+    ipc: host
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /subscriber/sources:/ros2_ws/src
+    command: ros2 run cpp_listener listener
+  lidar:
+    image: my_ros_images:lidar
+    build:
+      context: .
+      dockerfile: lidar/Dockerfile
+    network_mode: host
+    user: ros
+    ipc: host
+    device_cgroup_rules:
+      - "c *:* rmw"
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /lidar/sources:/ros2_ws/src
+      - /dev:/dev
+    command: ros2 launch ldlidar_stl_ros2 ld19.launch.py
